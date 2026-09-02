@@ -1,254 +1,162 @@
 # 🔒 VPN & Network Privacy Lab
 
-A hands-on networking lab exploring how public IP addresses, geographic network information, and internet traffic behavior change when using a cloud-hosted virtual machine and a Virtual Private Network (VPN).
+A networking lab using Microsoft Azure and Proton VPN to see how a VPN changes a device's public IP address and apparent location.
 
-In this project, I deployed a Windows 11 virtual machine in Microsoft Azure, connected to it remotely, compared public IP information across different network environments, and configured Proton VPN to observe how a VPN changes the public-facing network identity of a device.
-
----
-
-## 🎯 Project Overview
-
-The goal of this project was to better understand how public IP addresses identify internet connections and how VPNs affect the information visible to external websites.
-
-The lab compared three different network states:
-
-1. My local computer and network in Arizona
-2. A Microsoft Azure virtual machine hosted in Spain
-3. The same Azure virtual machine connected to a VPN server in the Netherlands
-
-By comparing the public IP address, network provider, and approximate geographic location at each stage, I was able to observe how internet traffic appears to originate from different networks depending on where the connection exits to the internet.
+I created a Windows 11 virtual machine in Azure, connected to it with Remote Desktop, and compared its network information before and after connecting to a VPN.
 
 ---
 
-## 🛠️ Technologies & Concepts
+## 🛠️ Technologies Used
 
 - Microsoft Azure
 - Windows 11 Pro
 - Azure Virtual Machines
-- Remote Desktop Protocol (RDP)
+- Remote Desktop (RDP)
 - Proton VPN
-- TCP/IP
 - Public IP Addressing
 - IP Geolocation
-- Virtual Private Networks (VPNs)
-- Network Connectivity
-- Cloud Computing
 
 ---
 
-## 🌐 Part 1 — Establishing a Local Network Baseline
+## 🌐 1. Check My Local Public IP
 
-Before creating the cloud environment, I checked the public IP information of my local computer using an IP lookup service.
+I started by checking the public IP address and network information of my local computer.
 
-The lookup identified the connection as originating from:
+The connection showed:
 
 - **ISP:** Arizona State University
-- **City:** Tempe
-- **Region:** Arizona
-- **Country:** United States
+- **Location:** Tempe, Arizona, United States
 
-This established a baseline that could later be compared with the Azure virtual machine and VPN connections.
+This gave me a starting point to compare against the Azure VM and VPN connection later.
 
-### 📸 Local Public IP Information
-
-![Local public IP information](images/local-ip.png)
-
-The initial lookup demonstrated that a public IP address can provide information about the network provider and approximate geographic location associated with an internet connection.
+![Local IP Address](images/local-ip.png)
 
 ---
 
-## ☁️ Part 2 — Deploying a Windows 11 Virtual Machine in Azure
+## ☁️ 2. Create the Azure Virtual Machine
 
-Next, I created a virtual machine in Microsoft Azure to establish a remote Windows environment located in another geographic region.
+Next, I created a Windows 11 virtual machine in Microsoft Azure.
 
-The VM was configured with:
+I purposely selected a region outside of the United States so I could compare its network location with my local computer.
 
-- **VM Name:** `vpn-test`
-- **Resource Group:** `daniel`
+### VM Configuration
+
+- **Name:** `vpn-test`
 - **Region:** Spain Central
 - **Operating System:** Windows 11 Pro
-- **VM Size:** `Standard_B2as_v2`
+- **Size:** `Standard_B2as_v2`
 - **vCPUs:** 2
-- **Memory:** 8 GiB
+- **RAM:** 8 GiB
 
-Hosting the virtual machine in Spain provided a remote environment whose network location could be compared with my local connection in Arizona.
-
-### 📸 Azure Virtual Machine
-
-![Azure Windows virtual machine](images/azure-vm.png)
+![Azure VM](images/azure-vm.png)
 
 ---
 
-## 🖥️ Part 3 — Connecting to the Azure VM
+## 🖥️ 3. Connect to the VM
 
-After the virtual machine was deployed, I obtained its public IP address and connected to the Windows 11 system using Remote Desktop.
+After the VM was running, I used its public IP address to connect through Remote Desktop.
 
-This allowed me to control the Azure-hosted computer from my local machine while applications and web requests executed from the remote VM.
+Before connecting to a VPN, I checked the VM's network information.
 
-Before connecting to a VPN, Proton VPN identified the VM's connection as:
+It showed:
 
 - **Country:** Spain
 - **Provider:** Microsoft Azure
 - **VPN Status:** Unprotected
 
-### 📸 Azure VM Before VPN Connection
+![Azure VM Before VPN](images/azure-vm-ip.png)
 
-![Azure VM public IP before VPN](images/azure-vm-ip.png)
+Even though I was controlling the VM from Arizona, internet traffic from inside the VM appeared to come from Spain.
 
-This demonstrated an important networking concept: although I was controlling the VM remotely from Arizona, internet activity performed inside the VM used the Azure VM's network connection in Spain rather than my local connection.
-
-At this stage, the connection could be represented as:
+At this point, the setup looked like:
 
 ```text
-Local Computer
-Tempe, Arizona
-      │
-      │ Remote Desktop
-      ▼
-Azure Windows 11 VM
+My Computer
+Arizona
+    │
+    │ Remote Desktop
+    ▼
+Azure VM
 Spain
-      │
-      ▼
-   Internet
+    │
+    ▼
+ Internet
 ```
 
 ---
 
-## 🔒 Part 4 — Connecting the VM to Proton VPN
+## 🔒 4. Connect to Proton VPN
 
-With the Azure VM running in Spain, I installed the Proton VPN desktop application inside the Windows 11 environment.
+Next, I installed Proton VPN on the Azure VM.
 
-After installing and signing into Proton VPN, I connected the VM to an available VPN server located in the **Netherlands**.
+I connected to a free VPN server, which selected a server in the **Netherlands**.
 
-### 📸 Proton VPN Connection
+Proton VPN now showed the connection as **Protected**.
 
-![Proton VPN connected to Netherlands](images/proton-vpn.png)
-
-The VPN client now reported the connection as **Protected**, confirming that the VPN tunnel had been established.
-
-At this point, the Azure VM was still hosted in Microsoft's Spain Central region, but its internet traffic was being routed through the VPN server in the Netherlands.
+![Proton VPN Connected](images/proton-vpn.png)
 
 ---
 
-## 🌍 Part 5 — Verifying the VPN Connection
+## 🌍 5. Verify the New Public IP
 
-After establishing the VPN connection, I returned to the IP lookup service from inside the Azure VM.
+With the VPN connected, I checked the VM's public IP information again.
 
-The public-facing network information had changed.
-
-The lookup reported:
+The connection now showed:
 
 - **ISP:** WorldStream B.V.
 - **Service:** VPN Server
-- **City:** Naaldwijk
-- **Region:** Zuid-Holland
-- **Country:** Netherlands
+- **Location:** Naaldwijk, Netherlands
 
-### 📸 Public IP After VPN Connection
+![IP Address After VPN](images/vpn-ip.png)
 
-![Public IP after connecting to VPN](images/vpn-ip.png)
+The VM was still hosted in Spain, but websites now saw the connection as coming from the VPN server in the Netherlands.
 
-The IP lookup service also detected that the connection was using a VPN.
-
-The Azure VM itself remained hosted in Spain, but external websites now identified the internet connection with the VPN server in the Netherlands.
-
-The completed network path could be represented as:
+The final setup looked like:
 
 ```text
-Local Computer
-Tempe, Arizona
-      │
-      │ Remote Desktop
-      ▼
-Azure Windows 11 VM
+My Computer
+Arizona
+    │
+    │ Remote Desktop
+    ▼
+Azure VM
 Spain
-      │
-      │ VPN Connection
-      ▼
+    │
+    │ VPN
+    ▼
 VPN Server
 Netherlands
-      │
-      ▼
-   Internet
+    │
+    ▼
+ Internet
 ```
 
 ---
 
 ## 📊 Results
 
-The three stages produced different public-facing network information.
+| Connection | Provider | Location |
+|---|---|---|
+| Local Computer | Arizona State University | Arizona, United States |
+| Azure VM | Microsoft Azure | Spain |
+| Azure VM + VPN | WorldStream B.V. | Netherlands |
 
-| Stage | Environment | Network / Provider | Approximate Location |
-|---|---|---|---|
-| 1 | Local Computer | Arizona State University | Tempe, Arizona, United States |
-| 2 | Azure Windows 11 VM | Microsoft Azure | Spain |
-| 3 | Azure VM + Proton VPN | WorldStream B.V. / VPN Server | Naaldwijk, Netherlands |
+The public-facing network location changed at each stage:
 
-The experiment demonstrated the progression:
-
-```text
-Local Network
-Arizona, United States
-       │
-       ▼
-Azure VM
-Spain
-       │
-       ▼
-VPN Server
-Netherlands
-```
-
-Each environment presented a different public IP address and associated network and geographic information to external services.
+**Arizona → Spain → Netherlands**
 
 ---
 
-## 🧠 Key Takeaways
+## 🧠 What I Learned
 
-### Public IP Addresses
+This lab helped me better understand:
 
-A public IP address represents a network's internet-facing identity. External services can use public IP information to determine details such as the associated network provider and approximate geographic location.
-
-### Remote Desktop & Cloud Networking
-
-Connecting to a remote computer does not mean that the remote computer uses the local machine's public IP address for its own internet requests.
-
-Although I controlled the Azure VM from Arizona using Remote Desktop, internet activity performed inside the VM used Microsoft's Azure infrastructure in Spain.
-
-### VPN Connections
-
-Connecting the Azure VM to Proton VPN changed the public IP address visible to external websites.
-
-Instead of seeing the Azure VM's original Spanish network connection, websites observed the public-facing IP associated with the VPN server in the Netherlands.
-
-### VPN Privacy
-
-A VPN can mask the original public IP address from destination websites by routing internet traffic through a VPN server.
-
-However, VPN usage does not provide complete anonymity. A VPN changes the network endpoint visible to destination services, but other technologies and account activity can still be used to identify or track users.
-
----
-
-## 🔐 Security & Privacy Considerations
-
-Sensitive information such as account passwords and authentication credentials was excluded from this repository.
-
-When documenting IT environments, credentials and other sensitive information should never be stored in source code, documentation, or public GitHub repositories.
-
----
-
-## 💡 Skills Demonstrated
-
-- Microsoft Azure virtual machine deployment
-- Windows 11 administration
-- Remote Desktop connectivity
-- VPN installation and configuration
-- Public IP address identification
-- IP geolocation analysis
-- Cloud networking fundamentals
-- VPN and network privacy concepts
-- Network connectivity verification
-- Cloud resource management
+- How public IP addresses identify an internet connection
+- How public IP addresses can be associated with an ISP and approximate location
+- How to create and remotely access a Windows VM in Microsoft Azure
+- How Remote Desktop allows me to control a computer running in another location
+- How a VPN changes the public IP address seen by websites
+- How internet traffic can be routed through a VPN server in another country
 
 ---
 
@@ -260,19 +168,9 @@ vpn-and-network-privacy-lab/
 ├── README.md
 │
 └── images/
-    ├── azure-vm-ip.png
-    ├── azure-vm.png
     ├── local-ip.png
+    ├── azure-vm.png
+    ├── azure-vm-ip.png
     ├── proton-vpn.png
     └── vpn-ip.png
 ```
-
----
-
-## 📚 Project Summary
-
-This project provided hands-on experience with public IP addressing, cloud-hosted virtual machines, Remote Desktop, and Virtual Private Networks.
-
-Starting from a local connection in Arizona, I deployed and remotely accessed a Windows 11 virtual machine hosted in Microsoft Azure's Spain Central region. I then connected the VM to a VPN server in the Netherlands and compared the public-facing network information at each stage.
-
-The lab demonstrated how the network through which internet traffic exits affects the public IP address, network provider information, and approximate geographic location observed by external services.
